@@ -1,6 +1,6 @@
 import snap
 
-UGraph = snap.GenRndGnm(snap.PUNGraph, 100, 1000)
+UGraph = snap.LoadEdgeList(snap.PUNGraph, "facebook_combined.txt", 0, 1)
 CmtyV = snap.TCnComV()
 modularity = snap.CommunityGirvanNewman(UGraph, CmtyV)
 for Cmty in CmtyV:
