@@ -30,12 +30,16 @@ s_originalcolor_val="#2ADDDD"
 e_source = "source"
 e_target = "target"
 e_id = "id"
+
+entity_hash_store ={}
+
 def deletefile(file):
     try:
         os.remove(file)
     except OSError:
         pass
-entity_hash_store ={}
+        
+
 
 
 def tuples(input_file):
@@ -99,28 +103,49 @@ def writeCommunityInfo(UGraph,grph):
     grph.contract_vertices(membship,combine_attrs="random")
     comm_graph = grph.simplify(combine_edges="random")
     freq = Counter(membship)
+    vidx=0
+    layout = comm_graph.layout("kk")
     for v in comm_graph.vs:
         v["size"]=freq[v["comm_id"]]
-        #{"name":"1","type":"Community","color":"#2ADDDD","comm":1,"size":2,"LabelInfo":{},"x":-4.8878,"y":9.8834,"id":"1","label":"1","comm_id":"1","originalcolor":"#2ADDDD"}
-        dct_str="{" + s_name + ":" + str(v["name"]) + "," + s_type + ":" + s_community + "," + s_color + ":" + s_comm_color + "," + s_comm + ":" + str(global_comm_id) + "," + s_size + ":" + str(v["size"]) + "," + s_labelinfo + ":{}," + s_x + ":" + s_xval + "," + s_y + ":" + s_yval + "," + s_id + ":" + str(v["name"]) + "," + s_label + ":" + str(global_comm_id) + "," + s_comm_id + ":" + str(global_comm_id) + "," + s_originalcolor+":" + s_originalcolor_val +"}"
-        nodes_dict.append(dct_str)
+        dct = {}
+        dct[s_name] = v["name"]
+        dct[s_type] = s_community 
+        dct[s_color] = s_comm_color
+        dct[s_comm] = str(global_comm_id)
+        dct[s_size] = str(v["size"])
+        dct[s_labelinfo] = {}
+        dct[s_x] = layout[vidx][0]
+        dct[s_y] = layout[vidx][1]
+        dct[s_id] = str(v.index)
+        dct[s_label] = str(global_comm_id)
+        dct[s_comm_id] = str(global_comm_id)
+        dct[s_originalcolor] = s_originalcolor_val
+        nodes_dict.append(dct)
+        vidx=vidx+1
+        
+    nodes_dict1 ={}
+    nodes_dict1["nodes"] = nodes_dict
     
-    nodes_dict1 = {"nodes":nodes_dict}
-    dct_str = ""
     idx = 1
     for e in comm_graph.es:
-        dct_str="{" + e_source + ":" + str(e.tuple[0]) + "," + e_target + ":" + str(e.tuple[1]) + "," + e_id + ":e" + str(idx) + "}"
-        edges_dict.append(dct_str)
+        dct = {}
+        dct[e_source] = str(e.tuple[0])
+        dct[e_target] = str(e.tuple[1])
+        dct[e_id] = ":e" + str(idx) 
+        edges_dict.append(dct)
         idx+=1
     
-    edges_dict1 = {"edges":edges_dict} 
+    edges_dict1={}
+    edges_dict1["edges"] = edges_dict
     total_dict=[]   
     total_dict.append(nodes_dict1)
     total_dict.append(edges_dict1)
     global_comm_id=global_comm_id+1
-    write_dict={global_comm_id:total_dict}
+    write_dict={}
+    write_dict[global_comm_id]=total_dict
+    x = json.dumps(write_dict)
     f= open('current_graph.json', 'a')
-    f.write(str(write_dict) + "\n")
+    f.write(str(x) + "\n")
     #print total_dict
 
 
