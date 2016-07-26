@@ -8,7 +8,7 @@ import os
 from collections import Counter
 from igraph import *
 
-global_comm_id = 0
+global_comm_id = -1
 
 s_name="name"
 s_type ="type"
@@ -83,13 +83,15 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     CmtyV = snap.TCnComV()
     modularity = snap.CommunityCNM(UGraph, CmtyV)
     dct = []
-    comm_indx = 0
+    comm_indx = -1
     dct_str = ""
     nodes_dict = []
     edges_dict=[]
     entity_dict = {}
     for Cmty in CmtyV:
-        print len(Cmty)
+        #print len(Cmty)
+        comm_indx = comm_indx+1
+        global_comm_id = global_comm_id +1
         verts_info =[]
         edges_info = []
         sub_gr_verts = []
@@ -106,7 +108,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
                        
             subgr_igr = Graph.TupleList(igraph_tuples("tempfile.txt"))            
             subgr_snap = snap.LoadEdgeList(snap.PUNGraph, "tempfile.txt",0, 1)
-            print "Calling writeCommunityInfo"
+            #print global_comm_id
             writeCommunityInfo(subgr_snap,subgr_igr,global_comm_id)
         else:
             layout_g = igr.layout("kk")
@@ -146,6 +148,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
             total_info=[]   
             write_info={}
             total_info = {"nodes":verts_info,"edges":edges_info}
+            print "Entities :" + str(global_comm_id)
             write_info[global_comm_id]=total_info
             x = json.dumps(write_info)
             f= open('current_graph.json', 'a')
@@ -155,10 +158,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
             membship.insert(verts.index(str(NI)),comm_indx)
             globalmemship.insert(verts.index(str(NI)),global_comm_id)
             
-        entity_dict[comm_indx] = verts_info
-        comm_indx = comm_indx+1
-        global_comm_id = global_comm_id +1
-	
+        #entity_dict[comm_indx] = verts_info	
     for idx,v in enumerate(grph.vs):
         v["comm_id"]=membship[idx]
         v["global_comm_id"]=globalmemship[idx]
@@ -175,6 +175,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
         dct[s_type] = s_community 
         dct[s_color] = s_comm_color
         dct[s_comm] = v["global_comm_id"]
+        print "Community :" + str( v["global_comm_id"])
         dct[s_size] = str(v["size"])
         dct[s_labelinfo] = {}
         dct[s_x] = layout[vidx][0]
@@ -199,6 +200,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     write_dict={}
     
     total_dict = {"nodes":nodes_dict,"edges":edges_dict}
+    
     write_dict[parent_comm_id]=total_dict
     x = json.dumps(write_dict)
     f= open('current_graph.json', 'a')
