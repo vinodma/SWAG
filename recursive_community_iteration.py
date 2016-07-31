@@ -8,7 +8,7 @@ import os
 from collections import Counter
 from igraph import *
 
-global_comm_id = -1
+global_comm_id = 0
 
 s_name="name"
 s_type ="type"
@@ -83,15 +83,13 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     CmtyV = snap.TCnComV()
     modularity = snap.CommunityCNM(UGraph, CmtyV)
     dct = []
-    comm_indx = -1
+    comm_indx = 0
     dct_str = ""
     nodes_dict = []
     edges_dict=[]
     entity_dict = {}
     for Cmty in CmtyV:
         #print len(Cmty)
-        comm_indx = comm_indx+1
-        global_comm_id = global_comm_id +1
         verts_info =[]
         edges_info = []
         sub_gr_verts = []
@@ -117,7 +115,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
                 NX = int(v["name"])
                 vert_info ={}
                 vert_info["name"] = entity_hash_store[NX]
-                vert_info["id"] = entity_hash_store[NX]
+                vert_info["id"] = str(v.index)
                 vert_info["label"] = entity_hash_store[NX]
                 vert_info["_rowee"] = entity_hash_store[NX]
                 vert_info["type"] = entity_type_store[NX]
@@ -158,7 +156,10 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
             membship.insert(verts.index(str(NI)),comm_indx)
             globalmemship.insert(verts.index(str(NI)),global_comm_id)
             
-        #entity_dict[comm_indx] = verts_info	
+        #entity_dict[comm_indx] = verts_info
+        comm_indx = comm_indx+1
+        global_comm_id = global_comm_id +1
+	
     for idx,v in enumerate(grph.vs):
         v["comm_id"]=membship[idx]
         v["global_comm_id"]=globalmemship[idx]
