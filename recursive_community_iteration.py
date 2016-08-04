@@ -69,7 +69,7 @@ def igraph_tuples(input_file):
       
 UGraph = snap.LoadEdgeList(snap.PUNGraph, "ctd_hash.txt",6, 7)
 grph = Graph.TupleList(tuples("ctd_hash.txt"))
-threshold = 800
+threshold = 100
 
 def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     global global_comm_id;
@@ -80,7 +80,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     for v in grph.vs:
         verts.append(v["name"])
     #print verts
-    print global_comm_id
+    #print global_comm_id
     CmtyV = snap.TCnComV()
     modularity = snap.CommunityCNM(UGraph, CmtyV)
     dct = []
@@ -90,7 +90,7 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     edges_dict=[]
     entity_dict = {}
     for Cmty in CmtyV:
-        #print len(Cmty)
+        print len(Cmty)
         verts_info =[]
         edges_info = []
         sub_gr_verts = []
@@ -102,8 +102,8 @@ def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
             
         igr = grph.subgraph(sub_gr_verts)
         
-        #print len(Cmty)
-        if(len(Cmty) > threshold):
+        print len(CmtyV)
+        if((len(Cmty) > threshold)and(len(CmtyV)>1)):
             deletefile("tempfile.txt")
             
             with open('tempfile.txt', 'w') as f:
