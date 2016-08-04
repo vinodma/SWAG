@@ -69,7 +69,7 @@ def igraph_tuples(input_file):
       
 UGraph = snap.LoadEdgeList(snap.PUNGraph, "ctd_hash.txt",6, 7)
 grph = Graph.TupleList(tuples("ctd_hash.txt"))
-threshold = 100
+threshold = 50
 
 def writeCommunityInfo(UGraph,grph,parent_comm_id=-1):
     global global_comm_id;
